@@ -116,7 +116,6 @@ class CreateVisits:
                 },
                 "service_line": visit_info.get_service_line()
             }
-            print(result,"\n\n\n")
-            # self.connection.insert_to_visits_collection(result)
+            self.connection.insert_to_visits_collection(result)
 
 
