@@ -1,6 +1,25 @@
 import shortuuid
 from bson import Decimal128
 
+"""
+class CisitInfo
+
+Methods:
+
+constructor  -->
+    param : visit info data
+
+    call from --> create_visit method in CreateVisits class
+----------------------------------------------------------
+getters
+----------------------------------------------------------
+Functions 
+generate_line_id -->
+    params no params 
+    
+    call from get_service_line
+"""
+
 
 def generate_line_id():
     return int(shortuuid.ShortUUID(alphabet="0123456789").random(length=10).lower())

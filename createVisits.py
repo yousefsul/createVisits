@@ -12,30 +12,42 @@ class Search
 Methods:
 
 constructor  -->
-    no params
+    params no params
 
     call from --> main method
 ----------------------------------------------------------
 search_patients_appoitemnts
-    no params
+    params no params
 
     call from --> main method
 ----------------------------------------------------------
 Functions:
 merge_patient_appointment -->
-    param tow dictionary : the first one for the appointemnt and the second one for the paitent
+    params tow dictionary : the first one for the appointemnt and the second one for the paitent
 
     call from --> search_patients_appoitemnts method
 
     return merged dictionary for the tow dictionaries
+----------------------------------------------------------
+get_current_status -->
+    params no params 
+    
+    call from create_visits method
+----------------------------------------------------------
+generate_vist_id -->
+    params no params 
+    
+    call from create_visits method
     """
 
 
+# retrun merged dictionary for the appointment and patient
 def merge_patient_appointment(patient_data, appointemnt_data):
     res = {**patient_data, **appointemnt_data}
     return res
 
 
+# create visit with current status new
 def get_current_status():
     current_status = {
         "status": "new",
@@ -46,12 +58,18 @@ def get_current_status():
     }
     return current_status
 
-
+# return id for each new visit
 def generate_vist_id():
     return int(shortuuid.ShortUUID(alphabet="0123456789").random(length=10).lower())
 
 
 class CreateVisits:
+    """
+    define patients,appointment,patient_data,appointemnt_data as none
+    define visits_data lists to have all visits for patients
+    define visit date and time created
+    create object from class ConnectMongoDB named connection
+    """
     def __init__(self):
         self.patients = None
         self.appointemnts = None
@@ -63,6 +81,10 @@ class CreateVisits:
         self.status_histroy = [get_current_status()]
         self.connection = ConnectMongoDB()
 
+    """
+    get the patients and appointemnts from database search for the matching result by name 
+    call merge_patient_appointment method and append the result to visits list 
+    """
     def search_patients_appoitemnts(self):
         self.connection.connect_to_patients_collection()
         self.connection.connect_to_appointments_collection()
@@ -78,6 +100,10 @@ class CreateVisits:
                     self.patient_data.rewind()
                     break
 
+    """
+    get the client information and consrtuct the vistis sections 
+    insert the result in database 
+    """
     def create_visits(self):
         self.connection.connect_to_visits_collection()
         self.connection.connect_to_client_collection()
@@ -117,5 +143,3 @@ class CreateVisits:
                 "service_line": visit_info.get_service_line()
             }
             self.connection.insert_to_visits_collection(result)
-
-

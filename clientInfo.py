@@ -1,13 +1,13 @@
 import math
 """
-class VisitInfo
+class CisitInfo
 
 Methods:
 
 constructor  -->
     param : client info data
 
-    call from --> create_visit method in Search class
+    call from --> create_visit method in CreateVisits class
 ----------------------------------------------------------
 getters
 ----------------------------------------------------------
