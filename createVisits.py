@@ -1,4 +1,10 @@
+import datetime
+
+import shortuuid
+
+from clientInfo import ClientInfo
 from connectMongoDB import ConnectMongoDB
+from visitInfo import VisitInfo
 
 """
 class Search
@@ -30,6 +36,21 @@ def merge_patient_appointment(patient_data, appointemnt_data):
     return res
 
 
+def get_current_status():
+    current_status = {
+        "status": "new",
+        "date": {
+            "date": datetime.datetime.now().date().strftime("%Y%m%d"),
+            "time": datetime.datetime.now().time().strftime("%H:%M:%S")
+        }
+    }
+    return current_status
+
+
+def generate_vist_id():
+    return int(shortuuid.ShortUUID(alphabet="0123456789").random(length=10).lower())
+
+
 class CreateVisits:
     def __init__(self):
         self.patients = None
@@ -37,6 +58,9 @@ class CreateVisits:
         self.patient_data = None
         self.appointemnt_data = None
         self.visits_data = []
+        self.visit_date = datetime.datetime.now().date().strftime("%Y%m%d")
+        self.visit_time = datetime.datetime.now().time().strftime("%H:%M:%S")
+        self.status_histroy = [get_current_status()]
         self.connection = ConnectMongoDB()
 
     def search_patients_appoitemnts(self):
@@ -53,3 +77,46 @@ class CreateVisits:
                     self.visits_data.append(merge_patient_appointment(patient_data, appointemnt_data))
                     self.patient_data.rewind()
                     break
+
+    def create_visits(self):
+        self.connection.connect_to_visits_collection()
+        self.connection.connect_to_client_collection()
+        client = self.connection.get_afroza_ahmed_info()
+        client_info = ClientInfo(client)
+        rendering_provider_info = client_info.get_rendering_provider_info()
+        for visit in self.visits_data:
+            visit_info = VisitInfo(visit, rendering_provider_info)
+            result = {
+                "header_section": {
+                    "visit_id": generate_vist_id(),
+                    "date_created": {
+                        "date": self.visit_date,
+                        "time": self.visit_time
+                    },
+                    "current_status": get_current_status(),
+                    "status_history": self.status_histroy
+                },
+                "client_info": client_info.get_client_info(),
+                "patient_info": visit_info.get_patient_info(),
+                "insurance_info": {
+                    "primary_insurance": visit_info.get_primary_insurance(),
+                    "secondary_insurance": visit_info.get_secondary_insurance(),
+                    "tertiary_insurance": visit_info.get_tertiary_insurance()
+                },
+                "home_plan_insurance": visit_info.get_home_plan_insurance(),
+                "plan_admin": visit_info.get_plan_admin(),
+                "service_facility_info": client_info.get_service_facility_info(),
+                "billing_provider_info": client_info.get_billing_provider_info(),
+                "events_date": visit_info.get_events_date(),
+                "miscellaneous": {"prior_authorization_number": ""},
+                "physician": {
+                    "ordering": visit_info.get_physician_ordering(),
+                    "referring": visit_info.get_referring_ordering(),
+                    "supervising": visit_info.get_supervising_ordering(),
+                },
+                "service_line": visit_info.get_service_line()
+            }
+            print(result,"\n\n\n")
+            # self.connection.insert_to_visits_collection(result)
+
+

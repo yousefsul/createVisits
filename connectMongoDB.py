@@ -14,6 +14,8 @@ class ConnectMongoDB:
             self.client_db = self.mongo_client.client_2731928905_DB
             self.patients_collection = None
             self.appointments_collection = None
+            self.clients_collection = None
+            self.visits_collection = None
         except ConnectionError:
             logging.error("constructor Method:         Error while connect to mongoDB")
             print("Error while connection to mongoDB")
@@ -29,3 +31,23 @@ class ConnectMongoDB:
 
     def get_appointments_data(self):
         return self.appointments_collection.find()
+
+    def connect_to_client_collection(self):
+        self.clients_collection = self.dev_db.clientsColl
+
+    def get_afroza_ahmed_info(self):
+        return self.clients_collection.find_one(
+            {
+                "client_info.contact.first": "Afroza",
+                "client_info.contact.last": "Ahmed"
+            }
+        )
+
+    def connect_to_visits_collection(self):
+        self.visits_collection = self.client_db.visitsColl
+
+    def insert_to_visits_collection(self, result):
+        try:
+            self.visits_collection.insert(result)
+        except Exception as e:
+            print("An Exception occurred ", e)

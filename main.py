@@ -12,6 +12,9 @@ if __name__ == '__main__':
     Main Method
     Create object from class CreateVisits
     call method search_patients_appoitemnts
+    call method create_visits
+
     """
     create_visits = CreateVisits()
     create_visits.search_patients_appoitemnts()
+    create_visits.create_visits()
