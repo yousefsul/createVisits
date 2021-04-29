@@ -28,6 +28,7 @@ def generate_line_id():
 class VisitInfo:
     def __init__(self, visit_info, rendering_provider):
         self.visit_info = visit_info
+        # print(self.visit_info,"\n\n")
         self.rendering_provider = rendering_provider
         self.events_date = {
             "onset_of_current": "",
@@ -100,3 +101,6 @@ class VisitInfo:
 
     def get_plan_admin(self):
         return self.visit_info.get("plan_admin")
+
+    def get_appointment_id(self):
+        return self.visit_info.get("_id")

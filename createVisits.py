@@ -58,6 +58,7 @@ def get_current_status():
     }
     return current_status
 
+
 # return id for each new visit
 def generate_vist_id():
     return int(shortuuid.ShortUUID(alphabet="0123456789").random(length=10).lower())
@@ -70,6 +71,7 @@ class CreateVisits:
     define visit date and time created
     create object from class ConnectMongoDB named connection
     """
+
     def __init__(self):
         self.patients = None
         self.appointemnts = None
@@ -85,6 +87,7 @@ class CreateVisits:
     get the patients and appointemnts from database search for the matching result by name 
     call merge_patient_appointment method and append the result to visits list 
     """
+
     def search_patients_appoitemnts(self):
         self.connection.connect_to_patients_collection()
         self.connection.connect_to_appointments_collection()
@@ -104,6 +107,7 @@ class CreateVisits:
     get the client information and consrtuct the vistis sections 
     insert the result in database 
     """
+
     def create_visits(self):
         self.connection.connect_to_visits_collection()
         self.connection.connect_to_client_collection()
@@ -143,3 +147,5 @@ class CreateVisits:
                 "service_line": visit_info.get_service_line()
             }
             self.connection.insert_to_visits_collection(result)
+            self.connection.update_status_for_appointment_collection(visit_info.get_appointment_id())
+            self.connection.update_appointment_current_status(visit_info.get_appointment_id())

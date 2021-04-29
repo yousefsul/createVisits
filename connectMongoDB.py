@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from pymongo import MongoClient
@@ -30,7 +31,9 @@ class ConnectMongoDB:
         return self.patients_collection.find()
 
     def get_appointments_data(self):
-        return self.appointments_collection.find()
+        return self.appointments_collection.find(
+            {"header_section.current_status.status": "new"}
+        )
 
     def connect_to_client_collection(self):
         self.clients_collection = self.dev_db.clientsColl
@@ -51,3 +54,30 @@ class ConnectMongoDB:
             self.visits_collection.insert(result)
         except Exception as e:
             print("An Exception occurred ", e)
+
+    def update_status_for_appointment_collection(self, appointment_id):
+        self.appointments_collection.update_one(
+            {"_id": appointment_id},
+            {"$push": {
+                "header_section.status_history": {
+                    "status": "visit created",
+                    "date": {
+                        "date": datetime.datetime.now().date().strftime("%Y%m%d"),
+                        "time": datetime.datetime.now().time().strftime("%H:%M:%S")
+                    }
+                }
+            }}
+        )
+
+    def update_appointment_current_status(self, appointment_id):
+        self.appointments_collection.find_and_modify(
+            query={"_id": appointment_id},
+            update={"$set": {
+                "header_section.current_status.status": "visit created",
+                "header_section.current_status.date": {
+                    "date": datetime.datetime.now().date().strftime("%Y%m%d"),
+                    "time": datetime.datetime.now().time().strftime("%H:%M:%S")
+                }}
+            },
+            upsert=True
+        )
